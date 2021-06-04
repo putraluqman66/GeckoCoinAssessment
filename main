@@ -1,0 +1,87 @@
+from pycoingecko import CoinGeckoAPI
+import time
+import numpy as np
+import pandas as pd
+cg = CoinGeckoAPI()
+
+#pull 10 ethereum in USD and BTC
+ethereum_USD_10=cg.get_coin_market_chart_by_id(id='ethereum', vs_currency='usd',days='10', interval='daily')
+
+Prices=ethereum_USD_10["prices"]
+#print(Prices)
+N=10
+pricelist=Prices[-N:]
+#seperate the list    
+Timestamp, price = map(list, zip(*pricelist))
+# printing result
+#print("\nfinal lists\n","time :", Timestamp, "\nPrice: ", price)
+
+MarketCaps=ethereum_USD_10["market_caps"]
+N=10
+market=MarketCaps[-N:]
+#seperate the list    
+Timestamp, mcaps = map(list, zip(*market))
+# printing result
+#print("\nfinal lists\n","time :", Timestamp, "\nMarket Caps: ", mcaps)
+
+Total_volumes=ethereum_USD_10["total_volumes"]
+N=10
+totvolume=Total_volumes[-N:]
+#seperate the list    
+Timestamp, tv = map(list, zip(*totvolume))
+# printing result
+#print("\nfinal lists\n","time :", Timestamp, "\nPrice: ", tv)
+
+ethereumUSD=pd.DataFrame(np.column_stack([Timestamp,price,mcaps,tv]), columns=['Date & Time', 'Price', 'Market caps ', 'Total Volume'])
+print("\IN USD\n",ethereumUSD)
+
+
+print("\n\nIN BTC\n")
+#pull 10 ethereum in BTC
+ethereum_BTC_10=cg.get_coin_market_chart_by_id(id='ethereum', vs_currency='btc',days='10', interval='daily')
+
+
+btcvalue=ethereum_BTC_10["prices"]
+N=10
+btcvaluelist=btcvalue[-N:]
+#seperate the list    
+Timestamp, btcval = map(list, zip(*btcvaluelist))
+#print("\nfinal lists\n","time :", Timestamp, "\nPrice: ", btcval)
+
+btc_marketCaps=ethereum_BTC_10["market_caps"]
+N=10
+btc_Mcaps_list=btc_marketCaps[-N:]
+#seperate the list    
+Timestamp, btcmcaps = map(list, zip(*btc_Mcaps_list))
+#print("\nfinal lists\n","time :", Timestamp, "\nPrice: ", btcmcaps)
+
+btc_totalVolume=ethereum_BTC_10["total_volumes"]
+N=10
+btc_totVolume_list=btc_totalVolume[-N:]
+#seperate the list    
+Timestamp, btctotalVolume = map(list, zip(*btc_totVolume_list))
+#print("\nfinal lists\n","time :", Timestamp, "\nPrice: ", btctotalVolume)
+
+ethereumBTC=pd.DataFrame(np.column_stack([Timestamp,btcval,btcmcaps,btctotalVolume]), columns=['Date & Time', 'Value in Btc', 'Market caps ', 'Total Volume'])
+print(ethereumBTC)
+
+gecko=cg.get_price(ids='ethereum', vs_currencies='usd,btc', include_market_cap='true', include_24hr_vol='true', include_24hr_change='true', include_last_updated_at='true',days='10',interval='daily')
+gecko
+
+Name='Ethereum'
+price_in_btc=gecko['ethereum']['btc']
+last_24h_change_btc=gecko['ethereum']['btc_24h_change']
+price_in_usd=gecko['ethereum']['usd']
+last_24h_change_usd=gecko['ethereum']['usd_24h_change']
+updated_at=gecko['ethereum']['last_updated_at']
+
+
+updated_at=time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(updated_at))
+
+
+geckotry=pd.DataFrame(np.column_stack([Name,price_in_btc,last_24h_change_btc,price_in_usd,last_24h_change_usd,updated_at]), columns=['Name', 'price_in_btc', 'last_24h_change_btc', 'price_in_usd','last_24h_change_usd','updated_at'])
+print(geckotry)
+
+geckotry.to_csv('geckotry.csv',index=False)
+
+pip freeze > requirement.txt
